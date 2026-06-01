@@ -5,7 +5,6 @@ dist
 .gitattributes
 Dockerfile
 .dockerignore
-nginx.conf
 *.md
 .idea/
 .vscode/
