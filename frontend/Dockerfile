@@ -4,6 +4,7 @@ WORKDIR /app
 
 ARG VUE_APP_API_URL=http://localhost:8081
 ENV VUE_APP_API_URL=${VUE_APP_API_URL}
+ENV NODE_OPTIONS=--openssl-legacy-provider
 
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
