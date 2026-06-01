@@ -14,7 +14,7 @@ jobs:
           uses: actions/checkout@v3
         - name: Set up Docker Buildx
           uses: docker/setup-buildx-action@v2
-        - name: Login to Docker 
+        - name: Login to Docker
           uses: docker/login-action@v2
           with:
             username: ${{ secrets.DOCKER_USER }}
@@ -31,6 +31,22 @@ jobs:
             context: ./frontend/
             push: true
             tags: ${{ secrets.DOCKER_USER }}/docker-project-frontend:latest
+        - name: Scan backend image with Trivy
+          uses: aquasecurity/trivy-action@master
+          with:
+            image-ref: ${{ secrets.DOCKER_USER }}/docker-project-backend:latest
+            format: table
+            exit-code: "0"
+            ignore-unfixed: true
+            severity: CRITICAL,HIGH
+        - name: Scan frontend image with Trivy
+          uses: aquasecurity/trivy-action@master
+          with:
+            image-ref: ${{ secrets.DOCKER_USER }}/docker-project-frontend:latest
+            format: table
+            exit-code: "0"
+            ignore-unfixed: true
+            severity: CRITICAL,HIGH
 
   run-with-docker-compose:
     name: Push Docker image to DockerHub

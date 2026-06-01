@@ -1,0 +1,44 @@
+services:
+  frontend:
+    build:
+      args:
+        VUE_APP_API_URL: http://localhost:8081
+    environment:
+      NODE_ENV: development
+    read_only: false
+    tmpfs: []
+    cap_drop: []
+    cap_add: []
+    security_opt: []
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 256M
+
+  backend:
+    environment:
+      LOG_LEVEL: debug
+    read_only: false
+    tmpfs: []
+    cap_drop: []
+    cap_add: []
+    security_opt: []
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 512M
+
+  nginx-lb:
+    read_only: false
+    tmpfs: []
+    cap_drop: []
+    cap_add: []
+    security_opt: []
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 128M

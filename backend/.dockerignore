@@ -1,0 +1,11 @@
+.git
+.gitignore
+.gitattributes
+Dockerfile
+.dockerignore
+*.md
+*.test
+*.out
+vendor/
+.idea/
+.vscode/

@@ -1,0 +1,12 @@
+node_modules
+dist
+.git
+.gitignore
+.gitattributes
+Dockerfile
+.dockerignore
+nginx.conf
+*.md
+.idea/
+.vscode/
+.DS_Store
