@@ -1,29 +1,38 @@
-FROM golang:1.21-alpine AS builder
+ARG GO_IMAGE=golang:1.26.4-alpine3.23
+FROM ${GO_IMAGE} AS builder
 
 WORKDIR /build
 
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY . .
+COPY cmd ./cmd
+COPY internal ./internal
 
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o api ./cmd/api
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -trimpath \
+    -ldflags="-s -w" \
+    -o /out/api ./cmd/api \
+    && mkdir -p /out/data \
+    && chown 65532:65532 /out/data
 
-FROM alpine:3.19
+FROM scratch
 
-RUN addgroup -S app && adduser -S -G app app
+WORKDIR /
 
-WORKDIR /app
+COPY --from=builder --chown=65532:65532 /out/api /api
+COPY --from=builder --chown=65532:65532 /out/data /data
 
-COPY --from=builder /build/api .
+USER 65532:65532
 
-RUN chown app:app api
-
-USER app
+ENV APP_PORT=8081 \
+    LOG_LEVEL=info \
+    ORDER_DB_PATH=/data/orders.seq \
+    ORDER_ID_SECRET_FILE=/run/secrets/order_id_secret
 
 EXPOSE 8081
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget -qO- http://localhost:8081/health || exit 1
+    CMD ["/api", "healthcheck"]
 
-CMD ["./api"]
+ENTRYPOINT ["/api"]
