@@ -58,27 +58,13 @@ jobs:
         uses: docker/setup-buildx-action@v2
       - name: Build via Docker Compose
         uses: hoverkraft-tech/compose-action@v2.2.0
-
-  security-and-smoke:
-    name: Security scan and smoke test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Validate Compose configuration
         run: docker compose config --quiet
-
-      - name: Build images
-        run: IMAGE_TAG=ci docker compose build
 
       - name: Scan backend image
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: momo-store-backend:ci
+          image-ref: momo-store-backend:1.0.0
           format: table
           exit-code: "1"
           ignore-unfixed: true
@@ -87,14 +73,11 @@ jobs:
       - name: Scan frontend image
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: momo-store-frontend:ci
+          image-ref: momo-store-frontend:1.0.0
           format: table
           exit-code: "1"
           ignore-unfixed: true
           severity: CRITICAL,HIGH
-
-      - name: Start services
-        run: IMAGE_TAG=ci docker compose up -d --wait
 
       - name: Smoke test
         run: |
@@ -105,7 +88,3 @@ jobs:
       - name: Show service logs
         if: failure()
         run: docker compose logs
-
-      - name: Stop services
-        if: always()
-        run: docker compose down -v
