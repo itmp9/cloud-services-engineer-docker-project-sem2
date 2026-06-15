@@ -2,14 +2,19 @@ package logger
 
 import (
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 var Log = zap.NewNop()
 
-// Setup builds and sets new logger
-func Setup() {
+func Setup(level string) {
+	logLevel := zapcore.InfoLevel
+	if level != "" {
+		_ = logLevel.Set(level)
+	}
+
 	cfg := &zap.Config{
-		Level:       zap.NewAtomicLevelAt(zap.DebugLevel),
+		Level:       zap.NewAtomicLevelAt(logLevel),
 		Development: false,
 		Sampling: &zap.SamplingConfig{
 			Initial:    100,

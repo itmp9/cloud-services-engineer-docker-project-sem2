@@ -7,6 +7,14 @@ import (
 
 // NewFakeDumplingsStore returns new fake store for app
 func NewFakeDumplingsStore() (dumplings.Store, error) {
+	return populateStore(fake.NewStore()), nil
+}
+
+func NewPersistentDumplingsStore(orderIDPath string, orderIDKey []byte) (dumplings.Store, error) {
+	return populateStore(fake.NewPersistentStore(orderIDPath, orderIDKey)), nil
+}
+
+func populateStore(store *fake.Store) dumplings.Store {
 	packs := []dumplings.Product{
 		{
 			ID:          1,
@@ -108,8 +116,7 @@ func NewFakeDumplingsStore() (dumplings.Store, error) {
 		},
 	}
 
-	store := fake.NewStore()
 	store.SetAvailablePacks(packs...)
 
-	return store, nil
+	return store
 }
